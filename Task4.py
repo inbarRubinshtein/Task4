@@ -13,10 +13,11 @@ def dict_destinations(destinations):#get all the data from the services and find
     data_citys = dict()
     cties=[]
     for city in destinations:
-        this_city = city.rstrip("\n")
-        data_citys[city] = arrange_data(get_reqsest_des(this_city,api_key),get_reqsest_loc(this_city,api_key))
+        this_city = city.strip("\n")
+        data_citys[city] = arrange_data(get_reqsest_des(this_city,api_key),get_reqsest_loc(this_city,api_key),city)
         leng.append(data_citys[city][0])
         cties.append(city)
+    print("***********")
     three_far(leng,cties)
   
    
@@ -51,13 +52,21 @@ def check_response(url):# send the requests and return the response or if there 
         print("something went wrong with response.get")
     return response_data
 
-def arrange_data(data_distanc,data_location):#arrange data as a tuple
-    the_tuple=(("Destination:"+data_distanc["rows"][0]["elements"][0]["distance"]["text"]),
-               ("Duration:"+data_distanc["rows"][0]["elements"][0]["duration"]["text"]),
-               ("Latitude:"+str(data_location["results"][0]["geometry"]["location"]["lat"])),
-               ("Length:"+str(data_location["results"][0]["geometry"]["location"]["lng"])))
+def arrange_data(data_distanc,data_location,city):#arrange data as a tuple
+    Destination=data_distanc["rows"][0]["elements"][0]["distance"]["text"]
+    Duration=data_distanc["rows"][0]["elements"][0]["duration"]["text"]
+    Latitude=str(data_location["results"][0]["geometry"]["location"]["lat"])
+    Length=str(data_location["results"][0]["geometry"]["location"]["lng"])
+    print(" the city:"+city+", is "+Destination+" and "+Duration+" from Tel Aviv")
+    print(" the location is:"+Latitude+"lat and "+Length+" len ")
+    print()
+    the_tuple=(("Destination:"+Destination),
+               ("Duration:"+Duration),
+               ("Latitude:"+Latitude),
+               ("Length:"+Length))
     return the_tuple
  
+
 def three_far(lengths,des):# The 3 cities furthest from Tel Aviv and print them 
     lengths_int=[]
     for l in lengths:
