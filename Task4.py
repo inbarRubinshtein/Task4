@@ -14,11 +14,17 @@ def dict_destinations(destinations):#get all the data from the services and find
     cties=[]
     for city in destinations:
         this_city = city.strip("\n")
-        data_citys[city] = arrange_data(get_reqsest_des(this_city,api_key),get_reqsest_loc(this_city,api_key),city)
-        leng.append(data_citys[city][0])
+        arrange = arrange_data(get_reqsest_des(this_city,api_key),get_reqsest_loc(this_city,api_key),city)
+        data_citys[city] = arrange
+        if not "there" in arrange:
+            leng.append(data_citys[city][0])
+        else:
+            leng.append(0)
         cties.append(city)
     print("***********")
-    three_far(leng,cties)
+    print(data_citys)
+    print("***********")
+    three_far(leng,data_citys)
   
    
 def get_reqsest_des(destinations,api_key): #the requests from the service "distancematrix"
@@ -53,33 +59,49 @@ def check_response(url):# send the requests and return the response or if there 
     return response_data
 
 def arrange_data(data_distanc,data_location,city):#arrange data as a tuple
-    Destination=data_distanc["rows"][0]["elements"][0]["distance"]["text"]
-    Duration=data_distanc["rows"][0]["elements"][0]["duration"]["text"]
-    Latitude=str(data_location["results"][0]["geometry"]["location"]["lat"])
-    Length=str(data_location["results"][0]["geometry"]["location"]["lng"])
-    print(" the city:"+city+", is "+Destination+" and "+Duration+" from Tel Aviv")
-    print(" the location is:"+Latitude+"lat and "+Length+" len ")
     print()
-    the_tuple=(("Destination:"+Destination),
-               ("Duration:"+Duration),
-               ("Latitude:"+Latitude),
-               ("Length:"+Length))
+    try:
+        Destination=data_distanc["rows"][0]["elements"][0]["distance"]["text"]
+        Duration=data_distanc["rows"][0]["elements"][0]["duration"]["text"]
+        Latitude=str(data_location["results"][0]["geometry"]["location"]["lat"])
+        Length=str(data_location["results"][0]["geometry"]["location"]["lng"])
+        print(" the city:"+city+", is "+Destination+" and "+Duration+" from Tel Aviv")
+        print(" the location is:"+Latitude+"lat and "+Length+" len ")
+        the_tuple=(("Destination:"+Destination),
+                   ("Duration:"+Duration),
+                   ("Latitude:"+Latitude),
+                   ("Length:"+Length))
+    except:
+        wrong="there is no data"
+        print(" the city:"+city+", "+wrong)
+        return wrong
     return the_tuple
  
 
 def three_far(lengths,des):# The 3 cities furthest from Tel Aviv and print them 
     lengths_int=[]
-    for l in lengths:
-        num=l.split(":")[1].split(" ")[0].split(",")
-        lengths_int.append((int)(num[0]+num[1]))
+    city_length=dict()
+    for city in des:
+        try:
+            num=des[city][0].split(":")[1].split(" ")[0].split(",")
+            lengths_int.append((int)(num[0]+num[1]))
+            city_length[city]=(int)(num[0]+num[1])
+        except:
+            lengths_int.append(0)
+            city_length[city]=0
     lengths_int.sort()
     lengths_int.reverse()
     i=0
     print("The 3 cities furthest from Tel Aviv is:")
-    for city in des:
-        if i<3:
-            print("place:"+str(i+1)+", ia the city:"+city+" with the distance:"+str(lengths_int[i])+" km")
-            i+=1
+    for l in lengths_int:
+        if i<3:   
+            for city in city_length:
+                if city_length[city]==l:
+                     print("place:"+str(i+1)+", ia the city:"+city+" with the distance:"+str(lengths_int[i])+" km")
+                     i+=1
+   
+       
+                  
         
        
         
